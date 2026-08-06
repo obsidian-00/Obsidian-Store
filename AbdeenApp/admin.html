@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSIDIAN NEXUS - مركز النشر</title>
+    <!-- خطوط جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #050507; 
+            --bg-glass: rgba(20, 22, 28, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --cyan-glow: rgba(56, 189, 248, 0.2);
+            --primary: #38BDF8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: block; 
+            padding-top: 150px; 
+            padding-bottom: 60px;
+            background-image: 
+                radial-gradient(circle at 50% 0%, #171A21 0%, transparent 50%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto; 
+            padding: 0 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* الهيدر الخاص بلوحة التحكم */
+        .admin-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(5, 5, 7, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 15px 0;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .logo-img {
+            height: 70px;
+            width: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .admin-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #FFF, #94A3B8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0;
+        }
+
+        .admin-header h1 span {
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .admin-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* لوحة الإدخال الزجاجية */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* تقسيم الحقول */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-right: 5px;
+        }
+
+        label i {
+            color: var(--primary);
+            margin-left: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: #0B0C10;
+            border: 1px solid #2D323E;
+            color: #FFF;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #475569;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--cyan-glow);
+            background: #0F131A;
+        }
+
+        /* زر النشر */
+        .publish-btn {
+            background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+            color: #FFF;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3);
+        }
+
+        .publish-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(2, 132, 199, 0.5);
+            background: linear-gradient(135deg, #7DD3FC 0%, #0369A1 100%);
+        }
+
+        .publish-btn i {
+            font-size: 20px;
+        }
+
+        /* شاشة صغيرة */
+        @media (max-width: 768px) {
+            .input-grid { grid-template-columns: 1fr; gap: 20px; }
+            .glass-panel { padding: 25px; }
+            body { padding-top: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <img src="logo.jpg" alt="Obsidian Logo" class="logo-img">
+        <h1>OBSIDIAN <span>NEXUS</span></h1>
+        <p>Secure Deployment Console</p>
+    </div>
+
+    <div class="admin-container">
+        <div class="glass-panel">
+            <div class="input-grid">
+                
+                <div class="input-group">
+                    <label><i class="fa-solid fa-cube"></i> اسم النظام / التطبيق</label>
+                    <input type="text" id="appName" placeholder="مثال: نظام إدارة المصانع" required>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fa-solid fa-code-branch"></i> رقم الإصدار</label>
+                    <input type="text" id="appVersion" placeholder="مثال: Version 1.0.2" required>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fa-solid fa-icons"></i> كود الأيقونة (FontAwesome)</label>
+                    <input type="text" id="appIcon" placeholder="مثال: fa-solid fa-moon" required>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fa-solid fa-link"></i> رابط التحميل المباشر</label>
+                    <input type="url" id="appLink" placeholder="اتركه فارغاً لجعله 'مغلق للعملاء'">
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fa-solid fa-tag"></i> المنصة الأولى (Tag 1)</label>
+                    <input type="text" id="tag1" placeholder="مثال: Android أو Windows" required>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fa-solid fa-microchip"></i> المنصة الثانية (Tag 2)</label>
+                    <input type="text" id="tag2" placeholder="مثال: Mobile App أو Local Network" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label><i class="fa-solid fa-align-right"></i> وصف تفصيلي</label>
+                    <textarea id="appDesc" rows="4" placeholder="اكتب وصفاً احترافياً يعكس مميزات النظام الخاص بك..." required></textarea>
+                </div>
+
+            </div>
+
+            <button class="publish-btn" onclick="addApp()" id="submitBtn">
+                <i class="fa-solid fa-cloud-arrow-up"></i> نشر في المتجر الآن
+            </button>
+        </div>
+    </div>
+
+    <!-- ربط Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFq9P-DWSpGHthCg-wPo18ZDEc0SCmtEE",
+            authDomain: "obsidian-store-21a3c.firebaseapp.com",
+            projectId: "obsidian-store-21a3c",
+            storageBucket: "obsidian-store-21a3c.firebasestorage.app",
+            messagingSenderId: "888201520225",
+            appId: "1:888201520225:web:70a72718322b524380f620",
+            measurementId: "G-84DK7008MP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.addApp = async function() {
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            
+            const name = document.getElementById('appName').value;
+            const desc = document.getElementById('appDesc').value;
+            if(!name || !desc) {
+                alert("يرجى إدخال اسم النظام والوصف على الأقل.");
+                return;
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> جاري النشر...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+            
+            try {
+                await addDoc(collection(db, "store_apps"), {
+                    name: name,
+                    version: document.getElementById('appVersion').value || 'Version 1.0',
+                    icon: document.getElementById('appIcon').value || 'fa-solid fa-box',
+                    tag1: document.getElementById('tag1').value || 'System',
+                    tag2: document.getElementById('tag2').value || 'Software',
+                    desc: desc,
+                    link: document.getElementById('appLink').value || '',
+                    timestamp: new Date()
+                });
+                
+                alert("تم إضافة النظام بنجاح إلى واجهة المتجر!");
+                window.location.reload();
+            } catch (e) {
+                console.error("Error: ", e);
+                alert("حدث خطأ أثناء الاتصال بقاعدة البيانات. تأكد من الإعدادات وصلاحيات Firebase.");
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>
