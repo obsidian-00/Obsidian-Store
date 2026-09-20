@@ -45,6 +45,31 @@
             background-size: 100% 100%, 40px 40px, 40px 40px;
         }
 
+        /* تنسيقات شاشة تسجيل الدخول */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 7, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .login-box {
+            background: var(--bg-glass); border: 1px solid var(--border-glass);
+            padding: 40px; border-radius: 20px; width: 90%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .login-box h2 { color: #FFF; margin-bottom: 20px; font-family: 'Montserrat', sans-serif; }
+        .login-box h2 span { color: var(--primary); }
+        .login-box input { margin-bottom: 15px; }
+        .login-btn {
+            background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+            color: #FFF; padding: 15px; width: 100%; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .login-btn:hover { background: linear-gradient(135deg, #7DD3FC 0%, #0369A1 100%); }
+        .login-error { color: #EF4444; font-size: 14px; margin-top: 10px; display: none; }
+
+        /* إخفاء لوحة التحكم حتى يتم تسجيل الدخول */
+        #mainAdminContent { display: none; }
+
         .admin-container {
             width: 100%;
             max-width: 900px;
@@ -108,6 +133,14 @@
             margin-top: 5px;
             text-transform: uppercase;
         }
+        
+        .logout-btn {
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif;
+            font-size: 12px; font-weight: bold; transition: 0.3s;
+        }
+        .logout-btn:hover { background: #EF4444; color: #FFF; }
 
         .glass-panel {
             background: var(--bg-glass);
@@ -284,82 +317,99 @@
             .admin-app-card { flex-direction: column; align-items: flex-start; gap: 15px; }
             .actions-btns { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
             .action-btn { justify-content: center; }
+            .logout-btn { top: 15px; transform: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <img src="logo.jpg" alt="Obsidian Logo" class="logo-img">
-        <h1>OBSIDIAN <span>NEXUS</span></h1>
-        <p>Secure Deployment Console</p>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <img src="../logo.jpg" alt="Logo" style="width:60px; border-radius:50%; margin-bottom:15px; border:2px solid rgba(255,255,255,0.2);">
+            <h2>OBSIDIAN <span>LOGIN</span></h2>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            <button class="login-btn" onclick="loginAdmin()">تسجيل الدخول</button>
+            <div id="loginError" class="login-error">بيانات الدخول غير صحيحة!</div>
+        </div>
     </div>
 
-    <div class="admin-container">
-        <!-- لوحة النشر والتعديل -->
-        <div class="glass-panel">
-            <div class="input-grid">
-                
-                <div class="input-group">
-                    <label><i class="fa-solid fa-cube"></i> اسم النظام / التطبيق</label>
-                    <input type="text" id="appName" placeholder="مثال: نظام إدارة المصانع" required>
-                </div>
-
-                <div class="input-group">
-                    <label><i class="fa-solid fa-layer-group"></i> نوع النظام</label>
-                    <select id="appType">
-                        <option value="app">📱 تطبيق هاتف (Mobile App)</option>
-                        <option value="web">🌐 موقع / نظام ويب (Web System)</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label><i class="fa-solid fa-code-branch"></i> رقم الإصدار</label>
-                    <input type="text" id="appVersion" placeholder="مثال: Version 1.0.2" required>
-                </div>
-
-                <div class="input-group">
-                    <label><i class="fa-solid fa-image"></i> أيقونة التطبيق (صورة)</label>
-                    <input type="file" id="appImage" accept="image/png, image/jpeg, image/webp">
-                </div>
-
-                <div class="input-group full-width">
-                    <label><i class="fa-solid fa-link"></i> رابط التحميل المباشر أو الموقع</label>
-                    <input type="url" id="appLink" placeholder="اتركه فارغاً لجعله 'مغلق للعملاء'">
-                </div>
-
-                <div class="input-group">
-                    <label><i class="fa-solid fa-tag"></i> المنصة الأولى (Tag 1)</label>
-                    <input type="text" id="tag1" placeholder="مثال: Android أو Windows" required>
-                </div>
-
-                <div class="input-group">
-                    <label><i class="fa-solid fa-microchip"></i> المنصة الثانية (Tag 2)</label>
-                    <input type="text" id="tag2" placeholder="مثال: Mobile App أو Local Network" required>
-                </div>
-
-                <div class="input-group full-width">
-                    <label><i class="fa-solid fa-align-right"></i> وصف تفصيلي</label>
-                    <textarea id="appDesc" rows="4" placeholder="اكتب وصفاً احترافياً يعكس مميزات النظام الخاص بك..." required></textarea>
-                </div>
-
-            </div>
-
-            <button class="publish-btn" onclick="saveData()" id="submitBtn">
-                <i class="fa-solid fa-cloud-arrow-up"></i> نشر في المتجر الآن
-            </button>
-            <button class="cancel-btn" onclick="cancelEdit()" id="cancelBtn">
-                <i class="fa-solid fa-xmark"></i> إلغاء التعديل
-            </button>
+    <!-- محتوى لوحة التحكم (مخفي الافتراضي) -->
+    <div id="mainAdminContent">
+        <div class="admin-header">
+            <button class="logout-btn" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
+            <img src="../logo.jpg" alt="Obsidian Logo" class="logo-img">
+            <h1>OBSIDIAN <span>NEXUS</span></h1>
+            <p>Secure Deployment Console</p>
         </div>
 
-        <!-- لوحة التطبيقات المنشورة (للحذف والتعديل) -->
-        <div class="glass-panel">
-            <h3 style="margin-bottom: 20px; color: #FFF; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
-                <i class="fa-solid fa-server" style="color: var(--primary);"></i> إدارة التطبيقات المنشورة
-            </h3>
-            <div class="apps-list-container" id="adminAppsList">
-                <p style="text-align: center; color: var(--text-muted);">جاري التحميل...</p>
+        <div class="admin-container">
+            <!-- لوحة النشر والتعديل -->
+            <div class="glass-panel">
+                <div class="input-grid">
+                    
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-cube"></i> اسم النظام / التطبيق</label>
+                        <input type="text" id="appName" placeholder="مثال: نظام إدارة المصانع" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-layer-group"></i> نوع النظام</label>
+                        <select id="appType">
+                            <option value="app">📱 تطبيق هاتف (Mobile App)</option>
+                            <option value="web">🌐 موقع / نظام ويب (Web System)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-code-branch"></i> رقم الإصدار</label>
+                        <input type="text" id="appVersion" placeholder="مثال: Version 1.0.2" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-image"></i> أيقونة التطبيق (صورة)</label>
+                        <input type="file" id="appImage" accept="image/png, image/jpeg, image/webp">
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label><i class="fa-solid fa-link"></i> رابط التحميل المباشر أو الموقع</label>
+                        <input type="url" id="appLink" placeholder="اتركه فارغاً لجعله 'مغلق للعملاء'">
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-tag"></i> المنصة الأولى (Tag 1)</label>
+                        <input type="text" id="tag1" placeholder="مثال: Android أو Windows" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-microchip"></i> المنصة الثانية (Tag 2)</label>
+                        <input type="text" id="tag2" placeholder="مثال: Mobile App أو Local Network" required>
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label><i class="fa-solid fa-align-right"></i> وصف تفصيلي</label>
+                        <textarea id="appDesc" rows="4" placeholder="اكتب وصفاً احترافياً يعكس مميزات النظام الخاص بك..." required></textarea>
+                    </div>
+
+                </div>
+
+                <button class="publish-btn" onclick="saveData()" id="submitBtn">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> نشر في المتجر الآن
+                </button>
+                <button class="cancel-btn" onclick="cancelEdit()" id="cancelBtn">
+                    <i class="fa-solid fa-xmark"></i> إلغاء التعديل
+                </button>
+            </div>
+
+            <!-- لوحة التطبيقات المنشورة (للحذف والتعديل) -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 20px; color: #FFF; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                    <i class="fa-solid fa-server" style="color: var(--primary);"></i> إدارة التطبيقات المنشورة
+                </h3>
+                <div class="apps-list-container" id="adminAppsList">
+                    <p style="text-align: center; color: var(--text-muted);">جاري التحميل...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -368,6 +418,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFq9P-DWSpGHthCg-wPo18ZDEc0SCmtEE",
@@ -381,12 +432,53 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         let imageBase64 = "";
         let currentEditId = null;
-        window.appsDataMap = {}; // حفظ البيانات لاستدعائها في التعديل
+        window.appsDataMap = {};
 
-        // تحويل الصورة وضغطها أوتوماتيكياً قبل الحفظ لتجنب خطأ الحجم
+        // التحقق من حالة تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainAdminContent').style.display = 'block';
+                loadAdminApps();
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainAdminContent').style.display = 'none';
+            }
+        });
+
+        // دالة تسجيل الدخول
+        window.loginAdmin = function() {
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPassword').value;
+            const errorMsg = document.getElementById('loginError');
+            
+            if(!email || !pass) {
+                errorMsg.innerText = "يرجى إدخال البريد وكلمة المرور!";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => { errorMsg.style.display = 'none'; })
+                .catch((error) => {
+                    errorMsg.innerText = "بيانات الدخول غير صحيحة!";
+                    errorMsg.style.display = 'block';
+                });
+        }
+
+        // دالة تسجيل الخروج
+        window.logoutAdmin = function() {
+            signOut(auth).then(() => {
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPassword').value = '';
+            });
+        }
+
+        // تحويل الصورة
         document.getElementById('appImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if(file) {
@@ -395,21 +487,11 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        let width = img.width; let height = img.height;
                         const MAX_WIDTH = 250; 
-                        
-                        if (width > MAX_WIDTH) {
-                            height = Math.round((height * MAX_WIDTH) / width);
-                            width = MAX_WIDTH;
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
+                        if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                         imageBase64 = canvas.toDataURL('image/jpeg', 0.7);
                     };
                     img.src = event.target.result;
@@ -418,37 +500,25 @@
             }
         });
 
+        // دالة الحفظ
         window.saveData = async function() {
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerHTML;
-            
             const name = document.getElementById('appName').value;
             const desc = document.getElementById('appDesc').value;
             const type = document.getElementById('appType').value;
 
-            if(!name || !desc) {
-                alert("يرجى إدخال اسم النظام والوصف.");
-                return;
-            }
-            if(!currentEditId && !imageBase64) { 
-                alert("يرجى اختيار صورة للأيقونة في حالة النظام الجديد."); 
-                return; 
-            }
+            if(!name || !desc) { alert("يرجى إدخال اسم النظام والوصف."); return; }
+            if(!currentEditId && !imageBase64) { alert("يرجى اختيار صورة للأيقونة في حالة النظام الجديد."); return; }
 
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> جاري الحفظ...';
-            btn.style.opacity = '0.7';
-            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7'; btn.style.pointerEvents = 'none';
             
             const dataToSave = {
-                name: name,
-                type: type,
-                version: document.getElementById('appVersion').value || 'Version 1.0',
-                tag1: document.getElementById('tag1').value || 'System',
-                tag2: document.getElementById('tag2').value || 'Software',
-                desc: desc,
-                link: document.getElementById('appLink').value || ''
+                name: name, type: type, version: document.getElementById('appVersion').value || 'Version 1.0',
+                tag1: document.getElementById('tag1').value || 'System', tag2: document.getElementById('tag2').value || 'Software',
+                desc: desc, link: document.getElementById('appLink').value || ''
             };
-
             if (imageBase64) { dataToSave.image = imageBase64; }
             if (!currentEditId) { dataToSave.timestamp = new Date(); }
 
@@ -460,129 +530,70 @@
                     await addDoc(collection(db, "store_apps"), dataToSave);
                     alert("تم إضافة النظام بنجاح إلى واجهة المتجر!");
                 }
-                
-                cancelEdit();
-                loadAdminApps();
-                
-            } catch (e) {
-                console.error("Error: ", e);
-                alert("حدث خطأ أثناء الاتصال بقاعدة البيانات.");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
-            }
+                cancelEdit(); loadAdminApps();
+            } catch (e) { alert("حدث خطأ! تأكد من صلاحيات قاعدة البيانات."); } 
+            finally { btn.innerHTML = originalText; btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
         }
 
+        // دالة التعديل
         window.editApp = function(docId) {
-            const data = window.appsDataMap[docId];
-            if(!data) return;
-
-            document.getElementById('appName').value = data.name;
-            document.getElementById('appType').value = data.type || 'app';
-            document.getElementById('appVersion').value = data.version;
-            document.getElementById('tag1').value = data.tag1;
-            document.getElementById('tag2').value = data.tag2;
-            document.getElementById('appDesc').value = data.desc;
-            document.getElementById('appLink').value = data.link || '';
-            
-            document.getElementById('appImage').value = '';
-            imageBase64 = "";
-            currentEditId = docId;
-
+            const data = window.appsDataMap[docId]; if(!data) return;
+            document.getElementById('appName').value = data.name; document.getElementById('appType').value = data.type || 'app';
+            document.getElementById('appVersion').value = data.version; document.getElementById('tag1').value = data.tag1;
+            document.getElementById('tag2').value = data.tag2; document.getElementById('appDesc').value = data.desc;
+            document.getElementById('appLink').value = data.link || ''; document.getElementById('appImage').value = '';
+            imageBase64 = ""; currentEditId = docId;
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> حفظ التعديلات';
             btn.style.background = 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)';
-            btn.style.boxShadow = '0 10px 20px rgba(217, 119, 6, 0.3)';
-            
-            document.getElementById('cancelBtn').style.display = 'flex';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('cancelBtn').style.display = 'flex'; window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // إلغاء التعديل
         window.cancelEdit = function() {
-            currentEditId = null;
-            document.getElementById('appName').value = '';
-            document.getElementById('appType').value = 'app';
-            document.getElementById('appVersion').value = '';
-            document.getElementById('tag1').value = '';
-            document.getElementById('tag2').value = '';
-            document.getElementById('appDesc').value = '';
-            document.getElementById('appLink').value = '';
-            document.getElementById('appImage').value = '';
-            imageBase64 = "";
-
+            currentEditId = null; document.getElementById('appName').value = ''; document.getElementById('appType').value = 'app';
+            document.getElementById('appVersion').value = ''; document.getElementById('tag1').value = '';
+            document.getElementById('tag2').value = ''; document.getElementById('appDesc').value = '';
+            document.getElementById('appLink').value = ''; document.getElementById('appImage').value = ''; imageBase64 = "";
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> نشر في المتجر الآن';
             btn.style.background = 'linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)';
-            btn.style.boxShadow = '0 10px 20px rgba(2, 132, 199, 0.3)';
-            
             document.getElementById('cancelBtn').style.display = 'none';
         }
 
-        // جلب التطبيقات وعرضها
+        // جلب التطبيقات
         window.loadAdminApps = async function() {
             const list = document.getElementById('adminAppsList');
             try {
                 const q = query(collection(db, "store_apps"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
-                
-                list.innerHTML = ''; 
-                window.appsDataMap = {};
-
-                if(querySnapshot.empty) {
-                    list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا توجد تطبيقات منشورة حالياً.</p>';
-                    return;
-                }
-
+                list.innerHTML = ''; window.appsDataMap = {};
+                if(querySnapshot.empty) { list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا توجد تطبيقات منشورة حالياً.</p>'; return; }
                 querySnapshot.forEach((documentSnapshot) => {
-                    const data = documentSnapshot.data();
-                    const docId = documentSnapshot.id;
-                    window.appsDataMap[docId] = data;
-
-                    const imgSource = data.image ? data.image : 'logo.jpg';
+                    const data = documentSnapshot.data(); const docId = documentSnapshot.id; window.appsDataMap[docId] = data;
+                    const imgSource = data.image ? data.image : '../logo.jpg';
                     const typeIcon = data.type === 'web' ? '<i class="fa-solid fa-globe"></i> ويب' : '<i class="fa-solid fa-mobile-screen"></i> تطبيق';
-                    
                     list.innerHTML += `
                         <div class="admin-app-card">
-                            <div class="admin-app-info">
-                                <img src="${imgSource}" class="admin-app-icon" alt="icon">
-                                <div class="admin-app-details">
-                                    <h4>${data.name} <span class="type-badge">${typeIcon}</span></h4>
-                                    <span>${data.version}</span>
-                                </div>
+                            <div class="admin-app-info"><img src="${imgSource}" class="admin-app-icon" alt="icon">
+                                <div class="admin-app-details"><h4>${data.name} <span class="type-badge">${typeIcon}</span></h4><span>${data.version}</span></div>
                             </div>
                             <div class="actions-btns">
-                                <button class="action-btn edit-btn" onclick="editApp('${docId}')">
-                                    <i class="fa-solid fa-pen"></i> تعديل
-                                </button>
-                                <button class="action-btn delete-btn" onclick="deleteApp('${docId}')">
-                                    <i class="fa-solid fa-trash"></i> حذف
-                                </button>
+                                <button class="action-btn edit-btn" onclick="editApp('${docId}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button class="action-btn delete-btn" onclick="deleteApp('${docId}')"><i class="fa-solid fa-trash"></i> حذف</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-            } catch (error) {
-                list.innerHTML = '<p style="text-align:center; color:#EF4444;">حدث خطأ في تحميل التطبيقات.</p>';
-            }
+            } catch (error) { list.innerHTML = '<p style="text-align:center; color:#EF4444;">حدث خطأ في تحميل التطبيقات.</p>'; }
         }
 
         // دالة الحذف
         window.deleteApp = async function(docId) {
-            const confirmDelete = confirm("متأكد إنك عايز تحذف التطبيق ده نهائياً من المتجر؟");
-            if (confirmDelete) {
-                try {
-                    await deleteDoc(doc(db, "store_apps", docId));
-                    loadAdminApps(); 
-                    if(currentEditId === docId) cancelEdit();
-                } catch (error) {
-                    alert("حدث خطأ أثناء الحذف.");
-                }
+            if (confirm("متأكد إنك عايز تحذف التطبيق ده نهائياً من المتجر؟")) {
+                try { await deleteDoc(doc(db, "store_apps", docId)); loadAdminApps(); if(currentEditId === docId) cancelEdit(); } 
+                catch (error) { alert("حدث خطأ أثناء الحذف. تأكد من صلاحياتك."); }
             }
         }
-
-        // تشغيل جلب التطبيقات أول ما الصفحة تفتح
-        loadAdminApps();
     </script>
 </body>
 </html>
